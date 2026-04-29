@@ -15,6 +15,15 @@ const port = 3000;
 //   res.send("Middleware funtion");
 // });
 
+// Dynamic path and query parameters
+app.get("/user/:userId", (req, res) => {
+  console.log("accessing dynamic path", req.params);
+  console.log("accessing query parameters", req.query);
+  res.send(
+    "logged dynamic path and if query parameters are present, they also logged",
+  );
+});
+
 app.get("/", (req, res) => {
   res.send("Home path response");
 });
