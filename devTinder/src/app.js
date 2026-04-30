@@ -4,47 +4,25 @@ const { studentMiddleware } = require("./middleware.js/sample-middleware");
 const app = express();
 const port = 3000;
 
-// Middleware
+//In express version 5, express will automatically catch error and pass it to error handling middleware,
+// so we don't need to use try-catch block in sync and async route handlers.
 
-app.get("/admin/getAllData", (req, res) => {
-  console.log("All data is sent");
+//In express version 4 exxpress will automatically catch error only for synchronous route.
+// For asynchronous route we need to use try-catch block or try and catch, in catch block then pass the error to next() function,
 
-  // const token = req.body?.token;
-  const token = "abc";
-  const isUserAuthenticated = token === "abc";
-
-  if (!isUserAuthenticated) {
-    return res.status(401).json({ error: "Unauthorized" });
-  } else {
-    res.send("All data is sent");
-  }
+// Synchronous Route Error
+app.get("/students", (req, res) => {
+  throw new Error("sync error in students route");
 });
 
-app.delete("/admin/delete", (req, res) => {
-  console.log("Data is deleted");
-
-  // const token = req.body?.token;
-  const token = "abc";
-  const isUserAuthenticated = token === "abc";
-
-  if (!isUserAuthenticated) {
-    return res.status(401).json({ error: "Unauthorized" });
-  } else {
-    res.send("Data is deleted");
-  }
+// Asynchronous Route Error
+app.get("/employee", async (req, res, next) => {
+  throw new Error("Async error in employee route");
 });
 
-//Instead of checking the token in each route, we can create a middleware function to handle authentication for all student routes.
-app.use("/student/data", studentMiddleware);
-
-app.get("/student/data/getData", (req, res) => {
-  console.log("Student data is sent");
-  res.send("Student data is sent");
-});
-
-app.delete("/student/data/delete", (req, res) => {
-  console.log("Student data is deleted");
-  res.send("Student data is deleted");
+// Error Handling Middleware
+app.use((err, req, res, next) => {
+  res.status(500).send(`Something went wrong! ${err.message}`);
 });
 
 app.listen(port, () => {
