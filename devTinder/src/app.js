@@ -3,63 +3,64 @@ const express = require("express");
 const app = express();
 const port = 3000;
 
-// Route handlers are executed in the order they are defined.
-// If multiple handlers match the same path and method,
-// the first one to send a response terminates the request-response cycle,causing subsequent matches to be ignored.
-
-// If you gto doubt about app.use or app.all, check once the documentataion(or definition).
-// Then play with this code and seee the output
-
-// app.use("/user", (req, res, next) => {
-//   console.log("Global middleware executed for every request to /user");
-//   res.send("Middleware funtion");
-// });
-
-// Dynamic path and query parameters
-app.get("/user/:userId", (req, res) => {
-  console.log("accessing dynamic path", req.params);
-  console.log("accessing query parameters", req.query);
-  res.send(
-    "logged dynamic path and if query parameters are present, they also logged",
-  );
-});
-
-app.get("/", (req, res) => {
-  res.send("Home path response");
-});
-
-// app.all("/user", (req, res) => {
-//   res.send("All method response for user endpoint");
-// });
-
+// This route will cause the client to wait indefinitely for a response, which will eventually lead to a timeout error on the client side
 app.get("/user", (req, res) => {
-  res.send("User path response");
-});
-
-app.get("/user", (req, res) => {
-  res.send(
-    "user path response is duplicated and this response will be ignored",
+  console.log("Get methd for /user route is called");
+  console.log(
+    "But we are not sending any response to the client, the client will wait for the response until it times out",
   );
+  // we are not sending any response to the client, so caller will wait for the response until it times out
+  // uncomment the below line, the caller get response and will not wait for the response until it times out
+  // res.send("This is the response from the server for /user route");
 });
 
-app.post("/user", (req, res) => {
-  console.log("post response for user endpoint");
-  res.send("post response for user endpoint");
+// PLAY WITH THESE BELOW MULTIPLE HANDLER EXAMPLES TO UNDERSTAND HOW THEY WORK
+// HOW next() works in multiple handler and how the order of handlers matter when we have multiple handlers for the same route
+// When express throw this Error [ERR_HTTP_HEADERS_SENT], the function terminates immediately and no further code is executed,
+
+// Multiple handler in the same route definition
+app.get(
+  "/student",
+  (req, res, next) => {
+    console.log("First Handler");
+    res.send("First response for /student route");
+    next();
+  },
+  (req, res, next) => {
+    console.log("Second handler");
+    // res.send("Second response for /student route");
+    // next()
+  },
+);
+
+// Multiple handler in different route definition
+app.get("/teacher", (req, res, next) => {
+  console.log("Fisrt hanlder for /teaher route");
+  next();
 });
 
-app.put("/user", (req, res) => {
-  console.log("Put response for user endpoint");
-  res.send("Put response for user endpoint");
+app.get("/teacher", (req, res, next) => {
+  console.log("Second handler for /teacher route");
+  res.send("Second response for /teacher route");
 });
 
-app.patch("/user", (req, res) => {
-  console.log("Patch response for user endpoint");
-  res.send("Patch response for user endpoint");
+//Multiple handler using app.use() and app.get() for the same route
+app.use("/employee", (req, res, next) => {
+  console.log("First handler for /employee route");
+  res.send("First response for /employee route");
+  next();
 });
 
-app.delete("/user", (req, res) => {
-  console.log("Delete response for user endpoint");
-  res.send("Delete response for user endpoint");
+app.get("/employee", (req, res, next) => {
+  console.log("Second handler for /employee route");
+  res.send("Second response for /employee route");
+  next();
+});
+
+app.get("/employee", (req, res, next) => {
+  console.log("Third handler for /employee route");
+  res.send("Third response for /employee route");
+  next();
 });
 
 app.listen(port, () => {
