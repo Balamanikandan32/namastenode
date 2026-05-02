@@ -65,6 +65,36 @@ app.get("/users", async (req, res) => {
   }
 });
 
+// delete user by id
+app.delete("/user/id/:id", async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const deletedUser = await User.findByIdAndDelete(userId);
+    if (deletedUser) {
+      res.send("User deleted succesfully");
+    } else {
+      res.status(404).send("User not found");
+    }
+  } catch (err) {
+    res.status(500).send("Something went wrong");
+  }
+});
+
+//update a user details using patch method
+app.patch("/user/id/:id", async (req, res) => {
+  const userId = req.params.id;
+  const data = req.body;
+  try {
+    const updatedUser = await User.findByIdAndUpdate(userId, data, {
+      returnDocument: "after",
+    });
+
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(500).send("Something went wrong");
+  }
+});
+
 connectDB()
   .then(() => {
     console.log("Connected to the database successfully");
