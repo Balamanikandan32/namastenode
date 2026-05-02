@@ -1,30 +1,39 @@
 const express = require("express");
 const { studentMiddleware } = require("./middleware.js/sample-middleware");
 
+const connectDB = require("./config/database");
+
+const User = require("./model/user");
+
 const app = express();
 const port = 3000;
 
-//In express version 5, express will automatically catch error and pass it to error handling middleware,
-// so we don't need to use try-catch block in sync and async route handlers.
+app.post("/signup", async (req, res) => {
+  // Creating a new instance of User model
+  const newUser = new User({
+    firstName: "Bala",
+    lastName: "manikandan",
+    age: 24,
+    email: "balabala@gamil.com",
+    password: "password",
+  });
 
-//In express version 4 exxpress will automatically catch error only for synchronous route.
-// For asynchronous route we need to use try-catch block or try and catch, in catch block then pass the error to next() function,
-
-// Synchronous Route Error
-app.get("/students", (req, res) => {
-  throw new Error("sync error in students route");
+  try {
+    await newUser.save();
+    res.send("User saved successfully");
+  } catch (err) {
+    console.log("Error saving user:", err);
+    res.status(500).send("Erro saving user");
+  }
 });
 
-// Asynchronous Route Error
-app.get("/employee", async (req, res, next) => {
-  throw new Error("Async error in employee route");
-});
-
-// Error Handling Middleware
-app.use((err, req, res, next) => {
-  res.status(500).send(`Something went wrong! ${err.message}`);
-});
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+connectDB()
+  .then(() => {
+    console.log("Connected to the database successfully");
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to connect to the database:", error);
+  });
