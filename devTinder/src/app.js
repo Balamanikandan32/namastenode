@@ -13,6 +13,12 @@ app.use(express.json());
 
 // create a new user
 app.post("/signup", async (req, res) => {
+  // Here you can do api-level validation of the request body before creating a new user
+  // either use libraries like zod or joi or do manuaal validaation
+  if (req.body?.skills.length > 20) {
+    res.status(400).send("You can add maximum 20 skills");
+  }
+
   // Creating a new instance of User model
   const newUser = new User(req.body);
   // Either use try -catch or use error handling middleware to handle errors
@@ -21,7 +27,7 @@ app.post("/signup", async (req, res) => {
     res.send("User saved successfully");
   } catch (err) {
     console.log("Error saving user:", err);
-    res.status(500).send("Error saving user");
+    res.status(500).send(`Something went wrong : ${err}`);
   }
 });
 
@@ -36,7 +42,7 @@ app.get("/user/:email", async (req, res) => {
       res.json(user);
     }
   } catch (err) {
-    res.status(500).send("Something went wrong");
+    res.status(500).send(`Something went wrong : ${err}`);
   }
 });
 
@@ -47,7 +53,7 @@ app.get("/user/id/:id", async (req, res) => {
     const user = await User.findById(userId);
     res.json(user);
   } catch (err) {
-    res.status(500).send("Something went wrong");
+    res.status(500).send(`Something went wrong : ${err}`);
   }
 });
 
@@ -61,7 +67,7 @@ app.get("/users", async (req, res) => {
       res.json(users);
     }
   } catch (err) {
-    res.status(500).send("Something went wrong");
+    res.status(500).send(`Something went wrong : ${err}`);
   }
 });
 
@@ -76,7 +82,7 @@ app.delete("/user/id/:id", async (req, res) => {
       res.status(404).send("User not found");
     }
   } catch (err) {
-    res.status(500).send("Something went wrong");
+    res.status(500).send(`Something went wrong : ${err}`);
   }
 });
 
@@ -87,11 +93,12 @@ app.patch("/user/id/:id", async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(userId, data, {
       returnDocument: "after",
+      runValidators: true,
     });
 
     res.json(updatedUser);
   } catch (err) {
-    res.status(500).send("Something went wrong");
+    res.status(500).send(`Something went wrong : ${err}`);
   }
 });
 
