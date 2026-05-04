@@ -1,9 +1,13 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
+
 const { studentMiddleware } = require("./middleware.js/sample-middleware");
 
 const connectDB = require("./config/database");
 
 const User = require("./model/user");
+
+const { signUpValidation } = require("./validation/validation");
 
 const app = express();
 const port = 3000;
@@ -12,15 +16,15 @@ const port = 3000;
 app.use(express.json());
 
 // create a new user
-app.post("/signup", async (req, res) => {
-  // Here you can do api-level validation of the request body before creating a new user
-  // either use libraries like zod or joi or do manuaal validaation
-  if (req.body?.skills.length > 20) {
-    res.status(400).send("You can add maximum 20 skills");
-  }
-
+app.post("/signup", signUpValidation, async (req, res) => {
   // Creating a new instance of User model
-  const newUser = new User(req.body);
+  const { firstName, lastName, email, password } = req.body;
+
+  const hashedPassword = await bcrypt.hash(password, 10); // Hash the password before saving to the database
+
+  const db_userData = { firstName, lastName, email, password: hashedPassword };
+
+  const newUser = new User(db_userData);
   // Either use try -catch or use error handling middleware to handle errors
   try {
     await newUser.save();
