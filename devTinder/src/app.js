@@ -52,13 +52,10 @@ app.post("/login", async (req, res) => {
       res.status(404).send("Invalid email");
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await user.validatePassword(password);
     if (isPasswordValid) {
       //created jwt token
-      //jwt token is expires in 7 days
-      const jwtToken = await jwt.sign({ _id: user._id }, "DEVTINDER", {
-        expiresIn: "7d",
-      });
+      const jwtToken = await user.getJWT();
 
       // send token as response.body
       const responseBody = {
