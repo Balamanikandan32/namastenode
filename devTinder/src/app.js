@@ -1,7 +1,9 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
-const { studentMiddleware } = require("./middleware.js/sample-middleware");
+const { studentMiddleware } = require("./middleware/sample-middleware");
 
 const connectDB = require("./config/database");
 
@@ -9,11 +11,16 @@ const User = require("./model/user");
 
 const { signUpValidation } = require("./validation/validation");
 
+const authMiddleware = require("./middleware/auth-middleware");
+
 const app = express();
 const port = 3000;
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+
+// Middleware to get cookies data in request header
+app.use(cookieParser());
 
 // create a new user
 app.post("/signup", signUpValidation, async (req, res) => {
@@ -47,13 +54,38 @@ app.post("/login", async (req, res) => {
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (isPasswordValid) {
-      res.send("Login successful");
+      //created jwt token
+      //jwt token is expires in 7 days
+      const jwtToken = await jwt.sign({ _id: user._id }, "DEVTINDER", {
+        expiresIn: "7d",
+      });
+
+      // send token as response.body
+      const responseBody = {
+        message: "Login successful",
+        token: jwtToken,
+      };
+
+      // send token as cookie
+      res.cookie("token", jwtToken);
+
+      res.send(responseBody);
     } else {
       res.status(401).send("Password is incorrect");
     }
   } catch (err) {
     res.status(500).send(`Something went wrong : ${err}`);
   }
+});
+
+// get profile api
+app.get("/profile", authMiddleware, (req, res) => {
+  res.send(req.user);
+});
+
+app.post("/sendconnectionrequest", authMiddleware, (req, res) => {
+  const userName = req.user?.firstName;
+  res.send(`${userName} send the connect request`);
 });
 
 // get user details by email id
