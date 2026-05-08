@@ -19,6 +19,40 @@ const signUpValidation = (req, res, next) => {
   }
 };
 
+const profileEditValidation = (req, res, next) => {
+  const allowedEditFields = ["firstName", "lastName", "skills", "gender"];
+
+  const reqFields = req.body;
+
+  const isEditDataValidated = Object.keys(reqFields).every((field) =>
+    allowedEditFields.includes(field),
+  );
+  if (isEditDataValidated) {
+    next();
+  } else {
+    res.send("Invalid edit field is being sent");
+  }
+};
+
+const profileEditPasswordValidation = (req, res, next) => {
+  const { password } = req.body;
+  try {
+    if (!password) {
+      throw new Error("Invalid data payload");
+    }
+    const isStrongPassword = validator.isStrongPassword(password);
+    if (isStrongPassword) {
+      next();
+    } else {
+      throw new Error("please enter a string password");
+    }
+  } catch (err) {
+    res.send("Error" + err.message);
+  }
+};
+
 module.exports = {
   signUpValidation,
+  profileEditValidation,
+  profileEditPasswordValidation,
 };
