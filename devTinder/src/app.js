@@ -1,17 +1,14 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
-const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
 
-const { studentMiddleware } = require("./middleware/sample-middleware");
+const cookieParser = require("cookie-parser");
 
 const connectDB = require("./config/database");
 
-const User = require("./model/user");
+const authRouter = require("./routes/auth");
 
-const { signUpValidation } = require("./validation/validation");
+const profileRouter = require("./routes/profile");
 
-const authMiddleware = require("./middleware/auth-middleware");
+const requestRouter = require("./routes/request");
 
 const app = express();
 const port = 3000;
@@ -22,139 +19,7 @@ app.use(express.json());
 // Middleware to get cookies data in request header
 app.use(cookieParser());
 
-// create a new user
-app.post("/signup", signUpValidation, async (req, res) => {
-  // Creating a new instance of User model
-  const { firstName, lastName, email, password } = req.body;
-
-  const hashedPassword = await bcrypt.hash(password, 10); // Hash the password before saving to the database
-
-  const db_userData = { firstName, lastName, email, password: hashedPassword };
-
-  const newUser = new User(db_userData);
-  // Either use try -catch or use error handling middleware to handle errors
-  try {
-    await newUser.save();
-    res.send("User saved successfully");
-  } catch (err) {
-    console.log("Error saving user:", err);
-    res.status(500).send(`Something went wrong : ${err}`);
-  }
-});
-
-// login api
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      res.status(404).send("Invalid email");
-    }
-
-    const isPasswordValid = await user.validatePassword(password);
-    if (isPasswordValid) {
-      //created jwt token
-      const jwtToken = await user.getJWT();
-
-      // send token as response.body
-      const responseBody = {
-        message: "Login successful",
-        token: jwtToken,
-      };
-
-      // send token as cookie
-      res.cookie("token", jwtToken);
-
-      res.send(responseBody);
-    } else {
-      res.status(401).send("Password is incorrect");
-    }
-  } catch (err) {
-    res.status(500).send(`Something went wrong : ${err}`);
-  }
-});
-
-// get profile api
-app.get("/profile", authMiddleware, (req, res) => {
-  res.send(req.user);
-});
-
-app.post("/sendconnectionrequest", authMiddleware, (req, res) => {
-  const userName = req.user?.firstName;
-  res.send(`${userName} send the connect request`);
-});
-
-// get user details by email id
-app.get("/user/:email", async (req, res) => {
-  const emailId = req.params.email;
-  try {
-    const user = await User.find({ email: emailId });
-    if (user.length === 0) {
-      res.status(404).send("User not found");
-    } else {
-      res.json(user);
-    }
-  } catch (err) {
-    res.status(500).send(`Something went wrong : ${err}`);
-  }
-});
-
-//get user details by id
-app.get("/user/id/:id", async (req, res) => {
-  const userId = req.params.id;
-  try {
-    const user = await User.findById(userId);
-    res.json(user);
-  } catch (err) {
-    res.status(500).send(`Something went wrong : ${err}`);
-  }
-});
-
-//get all the users
-app.get("/users", async (req, res) => {
-  try {
-    const users = await User.find({});
-    if (users.length === 0) {
-      res.status(404).send("No users found");
-    } else {
-      res.json(users);
-    }
-  } catch (err) {
-    res.status(500).send(`Something went wrong : ${err}`);
-  }
-});
-
-// delete user by id
-app.delete("/user/id/:id", async (req, res) => {
-  const userId = req.params.id;
-  try {
-    const deletedUser = await User.findByIdAndDelete(userId);
-    if (deletedUser) {
-      res.send("User deleted succesfully");
-    } else {
-      res.status(404).send("User not found");
-    }
-  } catch (err) {
-    res.status(500).send(`Something went wrong : ${err}`);
-  }
-});
-
-//update a user details using patch method
-app.patch("/user/id/:id", async (req, res) => {
-  const userId = req.params.id;
-  const data = req.body;
-  try {
-    const updatedUser = await User.findByIdAndUpdate(userId, data, {
-      returnDocument: "after",
-      runValidators: true,
-    });
-
-    res.json(updatedUser);
-  } catch (err) {
-    res.status(500).send(`Something went wrong : ${err}`);
-  }
-});
+app.use(authRouter, profileRouter, requestRouter);
 
 connectDB()
   .then(() => {
