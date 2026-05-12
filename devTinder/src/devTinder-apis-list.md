@@ -20,9 +20,9 @@
 
 ## ConnectionRequest Router
 
-<!-- Status  -> Ignore, Interest, Accept, Reject  -->
+<!-- Status  -> Ignored, Interested, Accepted, Rejected  -->
 
-- Post -> /request/send/ignore/:ignoreUserId
-- Post -> /request/send/interest/:interestUserId
-- Post -> /request/review/accept/:acceptUserId
-- Post -> /request/review/reject/:rejectUserId
+- Post -> /request/send/ignored/:ignoreUserId
+- Post -> /request/send/interested/:interestUserId
+- Post -> /request/review/accepted/:acceptUserId
+- Post -> /request/review/rejected/:rejectUserId
