@@ -14,9 +14,10 @@
 
 ## User Router
 
-- Get -> /user/feed <!-- Get a list of users in feed so user can swipe the user's profile -->
-- Get -> /user/connections <!-- Get a list of user connection -->
 - Get -> /user/connectionRequests <!-- Get a list of user connection request send by other user -->
+
+- Get -> /user/connections <!-- Get a list of user connection -->
+- Get -> /user/feed <!-- Get a list of users in feed so user can swipe the user's profile -->
 
 ## ConnectionRequest Router
 
@@ -24,5 +25,8 @@
 
 - Post -> /request/send/ignored/:ignoreUserId
 - Post -> /request/send/interested/:interestUserId
+  ( - Post -> /request/send/:status/:toUserId )
+
 - Post -> /request/review/accepted/:acceptUserId
 - Post -> /request/review/rejected/:rejectUserId
+  ( - Post -> /request/review/:status/:requestedId)

@@ -10,6 +10,8 @@ const profileRouter = require("./routes/profile");
 
 const requestRouter = require("./routes/request");
 
+const userRouter = require("./routes/user");
+
 const app = express();
 const port = 3000;
 
@@ -19,7 +21,7 @@ app.use(express.json());
 // Middleware to get cookies data in request header
 app.use(cookieParser());
 
-app.use(authRouter, profileRouter, requestRouter);
+app.use(authRouter, profileRouter, requestRouter, userRouter);
 
 connectDB()
   .then(() => {
