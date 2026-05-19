@@ -12,8 +12,17 @@ const requestRouter = require("./routes/request");
 
 const userRouter = require("./routes/user");
 
+const cors = require("cors");
+
 const app = express();
 const port = 3000;
+
+const corsOptions = {
+  origin: "http://localhost:5173", // Replace with your frontend URL
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 // Middleware to parse JSON bodies
 app.use(express.json());
