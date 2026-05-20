@@ -20,7 +20,13 @@ const signUpValidation = (req, res, next) => {
 };
 
 const profileEditValidation = (req, res, next) => {
-  const allowedEditFields = ["firstName", "lastName", "skills", "gender"];
+  const allowedEditFields = [
+    "firstName",
+    "lastName",
+    "skills",
+    "gender",
+    "photoUrl",
+  ];
 
   const reqFields = req.body;
 
@@ -30,7 +36,7 @@ const profileEditValidation = (req, res, next) => {
   if (isEditDataValidated) {
     next();
   } else {
-    res.send("Invalid edit field is being sent");
+    res.status(400).send("Invalid edit field is being sent");
   }
 };
 

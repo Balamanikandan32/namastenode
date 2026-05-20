@@ -7,7 +7,7 @@ const authMiddleware = async (req, res, next) => {
     // const tokenInHeader = req.get('authorization')
 
     if (!token) {
-      throw new Error("Invalid token please login");
+      return res.status(401).send("Invalid token please login");
     }
 
     const tokenHiddenData = await jwt.verify(token, "DEVTINDER");
@@ -19,10 +19,10 @@ const authMiddleware = async (req, res, next) => {
       req.userId = tokenHiddenData._id;
       next();
     } else {
-      throw new Error("invalid token please login");
+      throw new Error("User not found");
     }
   } catch (err) {
-    res.send("Error " + err.message);
+    res.status(400).send(err.message);
   }
 };
 
