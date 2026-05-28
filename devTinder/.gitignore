@@ -1,1 +1,7 @@
 node_modules/
+
+# Envrionement variable
+.env
+.env.development
+.env.production
+# instead of writing above, we can also write like this .env*

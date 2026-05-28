@@ -1,3 +1,5 @@
+require("./config/load-env");
+
 const express = require("express");
 
 const cookieParser = require("cookie-parser");
@@ -15,7 +17,7 @@ const userRouter = require("./routes/user");
 const cors = require("cors");
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT_NUMBER;
 
 const corsOptions = {
   origin: "http://localhost:5173", // Replace with your frontend URL

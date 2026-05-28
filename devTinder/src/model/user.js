@@ -28,8 +28,9 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.methods.getJWT = async function () {
+  const jwtSecretKey = process.env.JWT_SECRET;
   //jwt token is expires in 7 days
-  const jwtToken = await jwt.sign({ _id: this._id }, "DEVTINDER", {
+  const jwtToken = await jwt.sign({ _id: this._id }, jwtSecretKey, {
     expiresIn: "7d",
   });
 

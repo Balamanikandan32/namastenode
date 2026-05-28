@@ -10,7 +10,8 @@ const authMiddleware = async (req, res, next) => {
       return res.status(401).send("Invalid token please login");
     }
 
-    const tokenHiddenData = await jwt.verify(token, "DEVTINDER");
+    const jwtSecretKey = process.env.JWT_SECRET;
+    const tokenHiddenData = await jwt.verify(token, jwtSecretKey);
 
     const userData = await User.findById(tokenHiddenData._id);
 
