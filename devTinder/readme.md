@@ -27,3 +27,9 @@
   "dev": "cross-env NODE_ENV=development node server.js",
   "start": "cross-env NODE_ENV=production node server.js"
   }
+
+# cron jobs
+
+- we are using a node-cron package for cron jobs
+- Implement a sample use case
+  -- sending email(for now console loggnig) to evry user who got connection request for previous day

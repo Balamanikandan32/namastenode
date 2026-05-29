@@ -16,6 +16,8 @@ const userRouter = require("./routes/user");
 
 const cors = require("cors");
 
+require("./cron-jobs/node-cron-job");
+
 const app = express();
 const port = process.env.PORT_NUMBER;
 
