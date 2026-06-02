@@ -14,6 +14,8 @@ const requestRouter = require("./routes/request");
 
 const userRouter = require("./routes/user");
 
+const paymentRouter = require("./routes/payment");
+
 const cors = require("cors");
 
 require("./cron-jobs/node-cron-job");
@@ -34,7 +36,7 @@ app.use(express.json());
 // Middleware to get cookies data in request header
 app.use(cookieParser());
 
-app.use(authRouter, profileRouter, requestRouter, userRouter);
+app.use(authRouter, profileRouter, requestRouter, userRouter, paymentRouter);
 
 connectDB()
   .then(() => {

@@ -33,3 +33,23 @@
 - we are using a node-cron package for cron jobs
 - Implement a sample use case
   -- sending email(for now console loggnig) to evry user who got connection request for previous day
+
+# Payment Gateway Integration
+
+- Create a razorpay account
+- Create a premium/product page in frontend
+- Develop a sample code like subscription, buying e-commerce product.
+- Install a razorpay module in backend application (npm i razorpay)
+- Generate a API KEY from the razorpay dashboard.
+- Develop a express router for payment APIs.
+- INTEGRATION-STEPS
+  - Instantiate the Razorpay instance
+  - Create a order api
+    -- In order api handler, create an order
+    -- save the order on the database and return the order detail to frontend
+  - Make an api call in frontend to backend for creating order api.
+  - Once ORDER is created, we can open the razorpay checkout page(payment dialog box, integrate it on frontend).
+  - Razorpay process the payment and call the handler function in checkout option
+  - Call the backend api to update the UI
+  - Set up the web hook on Razorpay Dashboard
+  - In backend write the webhook api to verify the payment and update the database.

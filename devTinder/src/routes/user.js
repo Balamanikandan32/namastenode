@@ -99,6 +99,17 @@ userRouter.get("/user/feed", authMiddleware, async (req, res) => {
   }
 });
 
+userRouter.get("/user/premiumStatus", authMiddleware, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+    return res.send({
+      isPremium: loggedInUser.isPremium,
+    });
+  } catch (err) {
+    res.status(400).send("Error :" + err.message);
+  }
+});
+
 module.exports = userRouter;
 
 // PAGINATION
