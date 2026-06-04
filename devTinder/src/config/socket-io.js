@@ -1,0 +1,51 @@
+const { Server } = require("socket.io");
+
+const crypto = require("crypto");
+
+const getRoomId = (fromUserId, toUserId) => {
+  // Generate a unique room ID based on user IDs (e.g., sorted and concatenated).
+  // Room ID should be the same for both users to join the same room and communicate.
+  // Room Id should be unique and good to hash to avoid exposing the room ID to the client.
+
+  const text = [fromUserId, toUserId].sort().join("-");
+
+  const roomId = crypto
+    .createHash("sha256") // Set the algorithm
+    .update(text) // Pass the input data
+    .digest("hex");
+
+  return roomId;
+};
+
+const initlaizeSocket = (httpServer) => {
+  const io = new Server(httpServer, {
+    cors: {
+      origin: "http://localhost:5173", // Replace with your frontend URL
+    },
+  });
+
+  io.on("connection", (socket) => {
+    // handling event
+
+    socket.on("joinChat", ({ fromUserId, toUserId }) => {
+      const roomId = getRoomId(fromUserId, toUserId);
+      console.log(`Room ID: ${roomId}`);
+
+      socket.join(roomId);
+    });
+
+    socket.on("sendMessage", ({ fromUserId, toUserId, message }) => {
+      const roomId = getRoomId(fromUserId, toUserId);
+
+      io.to(roomId).emit("messageReceived", {
+        fromUserId,
+        toUserId,
+        message,
+      });
+    });
+
+    socket.on("disconnect", () => {});
+  });
+};
+
+module.exports = initlaizeSocket;

@@ -53,3 +53,17 @@
   - Call the backend api to update the UI
   - Set up the web hook on Razorpay Dashboard
   - In backend write the webhook api to verify the payment and update the database.
+
+# WebSocket(socket.io)
+
+- Created a chat button in connection page that navigate to /chat/:toUserId
+- Created a /chat/:toUserId basic page with chat header, dummy chat body and input box, send button.
+- Install the socket.io on backend application (npm i socket.io).
+- Initialize the socket.io server (currently we are using express, so initalize the socket.io with express).
+- Created some event syntax such aas joinChat, sendMessage, disconnect.
+- Install the socket.io-client on frontend application(npm i socket.io-client).
+- Configure a socket connection to backend.
+- In chat/:toUserID page, create a socket connection and emit a jonChat event and closes the connection.
+- In backend joinChat event crate a roomId and use join method.
+- Emit a send Message event in frontend to backend and in backend use to method and emit a messageReceived event.
+- In frontend accept(on event) the messageReceived event and update the message state variable.

@@ -2,6 +2,8 @@ require("./config/load-env");
 
 const express = require("express");
 
+const { createServer } = require("http");
+
 const cookieParser = require("cookie-parser");
 
 const connectDB = require("./config/database");
@@ -17,6 +19,7 @@ const userRouter = require("./routes/user");
 const paymentRouter = require("./routes/payment");
 
 const cors = require("cors");
+const initlaizeSocket = require("./config/socket-io");
 
 require("./cron-jobs/node-cron-job");
 
@@ -38,10 +41,14 @@ app.use(cookieParser());
 
 app.use(authRouter, profileRouter, requestRouter, userRouter, paymentRouter);
 
+const httpServer = createServer(app);
+
+initlaizeSocket(httpServer);
+
 connectDB()
   .then(() => {
     console.log("Connected to the database successfully");
-    app.listen(port, () => {
+    httpServer.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     });
   })
