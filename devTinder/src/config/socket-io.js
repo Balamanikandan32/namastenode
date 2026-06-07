@@ -2,6 +2,8 @@ const { Server } = require("socket.io");
 
 const crypto = require("crypto");
 
+const ChatModel = require("../model/chat");
+
 const getRoomId = (fromUserId, toUserId) => {
   // Generate a unique room ID based on user IDs (e.g., sorted and concatenated).
   // Room ID should be the same for both users to join the same room and communicate.
@@ -29,18 +31,36 @@ const initlaizeSocket = (httpServer) => {
 
     socket.on("joinChat", ({ fromUserId, toUserId }) => {
       const roomId = getRoomId(fromUserId, toUserId);
-      console.log(`Room ID: ${roomId}`);
+      // console.log(`Room ID: ${roomId}`);
 
       socket.join(roomId);
     });
 
-    socket.on("sendMessage", ({ fromUserId, toUserId, message }) => {
+    socket.on("sendMessage", async ({ fromUserId, toUserId, message }) => {
       const roomId = getRoomId(fromUserId, toUserId);
 
+      // save message on the database.
+      let chatMessage = await ChatModel.findOne({
+        participants: { $all: [fromUserId, toUserId] },
+      });
+
+      if (!chatMessage) {
+        chatMessage = new ChatModel({
+          participants: [fromUserId, toUserId],
+          message: [],
+        });
+      }
+
+      chatMessage.message.push({ senderId: fromUserId, text: message });
+      const data = await chatMessage.save();
+
+      const populatedData = await data.populate({
+        path: "message.senderId",
+        select: "firstName _id",
+      });
+
       io.to(roomId).emit("messageReceived", {
-        fromUserId,
-        toUserId,
-        message,
+        populatedData,
       });
     });
 

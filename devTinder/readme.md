@@ -67,3 +67,8 @@
 - In backend joinChat event crate a roomId and use join method.
 - Emit a send Message event in frontend to backend and in backend use to method and emit a messageReceived event.
 - In frontend accept(on event) the messageReceived event and update the message state variable.
+- Create a scheme for chat to store the chat details in db and save the message in sendMessage in socket event.
+- Create a api to get the chat message
+- Once the chat is loaded fetch the chat message on frontend.
+- Render the message in frontend.
+- This chat is very very basic. This is only for learning how websocket work, and not chat real time application.

@@ -18,6 +18,8 @@ const userRouter = require("./routes/user");
 
 const paymentRouter = require("./routes/payment");
 
+const chatRouter = require("./routes/chat");
+
 const cors = require("cors");
 const initlaizeSocket = require("./config/socket-io");
 
@@ -39,7 +41,14 @@ app.use(express.json());
 // Middleware to get cookies data in request header
 app.use(cookieParser());
 
-app.use(authRouter, profileRouter, requestRouter, userRouter, paymentRouter);
+app.use(
+  authRouter,
+  profileRouter,
+  requestRouter,
+  userRouter,
+  paymentRouter,
+  chatRouter,
+);
 
 const httpServer = createServer(app);
 
